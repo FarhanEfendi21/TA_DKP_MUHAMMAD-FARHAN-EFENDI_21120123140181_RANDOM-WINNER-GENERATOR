@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Random Team Generator</title>
     <link rel="stylesheet" type="text/css" href="Team.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
 </head>
 
 <body>
@@ -15,7 +16,7 @@
         <div class="random-name">
             <nav>
                 <ul>
-                    <li><a href="main.php">RANDOM WINNER PICKER</a></li>
+                    <li><a href="main.php">RANDOM WINNER GENERATOR</a></li>
                 </ul>
             </nav>
         </div>
@@ -34,101 +35,115 @@
             <input type="submit" name="clearAll" value="Clear All"><br>
             <input type="submit" name="generateTeam" value="Generate Team">
         </form>
+    
+<?php
+session_start();
 
-        <?php
-        session_start();
+class TeamManager {
+    private $calon;
+    private $teams;
 
+    public function __construct() {
         if (!isset($_SESSION['calon'])) {
             $_SESSION['calon'] = [];
         }
+        if (!isset($_SESSION['teams'])) {
+            $_SESSION['teams'] = [];
+        }
+        $this->calon = &$_SESSION['calon'];
+        $this->teams = &$_SESSION['teams'];
+    }
 
-        function stackPush() {
-            if (!empty($_POST['userInput'])) {
-                $entries = explode("\n", $_POST['userInput']);
-                foreach ($entries as $entry) {
-                    $entry = trim($entry);
-                    if (!empty($entry) && !in_array($entry, $_SESSION['calon'])) {
-                        array_push($_SESSION['calon'], $entry);
-                    }
+    public function stackPush($input) {
+        if (!empty($input)) {
+            $entries = explode("\n", $input);
+            foreach ($entries as $entry) {
+                $entry = trim($entry);
+                if (!empty($entry) && !in_array($entry, $this->calon)) {
+                    array_push($this->calon, $entry);
                 }
             }
         }
+    }
 
-        function stackPop() {
-            array_pop($_SESSION['calon']);
-            unset($_SESSION['teams']);
-        }
+    public function stackPop() {
+        array_pop($this->calon);
+        unset($_SESSION['teams']);
+    }
 
-        function clearAll() {
-            $_SESSION['calon'] = [];
-            unset($_SESSION['teams']);
-        }
+    public function clearAll() {
+        $this->calon = [];
+        unset($_SESSION['teams']);
+    }
 
-        if (isset($_POST['clearAll'])) {
-            clearAll();
-        }
+    public function tampilData() {
+        echo "<pre>Calon Anggota Tim:\n";
+        echo implode("\n", $this->calon) . "</pre>";
+    }
 
-        function tampilData() {
-            echo "<pre>Calon Anggota Tim:\n";
-            echo implode("\n", $_SESSION['calon']) . "</pre>";
-        }
-
-        function tampilTim() {
-            if (isset($_SESSION['teams'])) {
-                echo "<div id='winnerList'><pre>Daftar Tim:\n";
-                foreach ($_SESSION['teams'] as $index => $team) {
-                    echo "Tim " . ($index + 1) . ": " . implode(", ", $team) . "\n";
-                }
-                echo "</pre></div>";
+    public function tampilTim() {
+        if (!empty($this->teams)) {
+            echo "<div id='winnerList'><pre>Daftar Tim:\n";
+            foreach ($this->teams as $index => $team) {
+                echo "Tim " . ($index + 1) . " : " . implode(", ", $team) . "\n";
             }
+            echo "</pre></div>";
         }
+    }
 
-        function randomFunction() {
-            if (!empty($_SESSION['calon'])) {
-                echo "<script>showLoadingBar();</script>";
+    public function randomFunction($teamCount) {
+        if (!empty($this->calon)) {
 
-                if (!isset($_SESSION['teams'])) {
-                    $_SESSION['teams'] = [];
-                }
-
-                $teamCount = isset($_POST['teamCount']) ? (int)$_POST['teamCount'] : 1;
-                $totalMembers = count($_SESSION['calon']);
-
-                if ($totalMembers < $teamCount) {
-                    echo "<script>alert('Jumlah kandidat tidak cukup untuk membuat $teamCount tim. Dibutuhkan minimal $teamCount kandidat.');</script>";
-                    return;
-                }
-
-                shuffle($_SESSION['calon']);
-
-                $teams = array_fill(0, $teamCount, []);
-                for ($i = 0; $i < $totalMembers; $i++) {
-                    $teams[$i % $teamCount][] = $_SESSION['calon'][$i];
-                }
-
-                $_SESSION['teams'] = $teams;
-                $_SESSION['calon'] = [];
-
-                echo "<script>hideLoadingBar();</script>";
-            } else {
-                echo "<pre>Tidak ditemukan kandidat</pre>";
+            if (empty($this->teams)) {
+                $this->teams = [];
             }
-        }
 
-        if (isset($_POST['submit'])) {
-            stackPush();
-            tampilData();
+            $totalMembers = count($this->calon);
+
+            if ($totalMembers < $teamCount) {
+                echo "<script>alert('Jumlah kandidat tidak cukup untuk membuat $teamCount tim. Dibutuhkan minimal $teamCount kandidat.');</script>";
+                return;
+            }
+
+            shuffle($this->calon);
+
+            $teams = array_fill(0, $teamCount, []);
+            for ($i = 0; $i < $totalMembers; $i++) {
+                $teams[$i % $teamCount][] = $this->calon[$i];
+            }
+
+            $this->teams = $teams;
+            $this->calon = [];
+
+        } else {
+            echo "<pre>Tidak ditemukan kandidat</pre>";
         }
-        if (isset($_POST['popData'])) {
-            stackPop();
-            tampilData();
-        }
-        if (isset($_POST['generateTeam'])) {
-            randomFunction();
-            tampilTim();
-        }
-        ?>
-    </div>
+    }
+}
+
+$teamManager = new TeamManager();
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (isset($_POST['submit'])) {
+        $teamManager->stackPush($_POST['userInput']);
+        $teamManager->tampilData();
+
+    } elseif (isset($_POST['popData'])) {
+        $teamManager->stackPop();
+        $teamManager->tampilData();
+
+    } elseif (isset($_POST['generateTeam'])) {
+        $teamCount = isset($_POST['teamCount']) ? (int)$_POST['teamCount'] : 1;
+        $teamManager->randomFunction($teamCount);
+        $teamManager->tampilTim();
+
+    } elseif (isset($_POST['clearAll'])) {
+        $teamManager->clearAll();
+    }
+}
+?>
+  
+  </div>
 </body>
 
 </html>

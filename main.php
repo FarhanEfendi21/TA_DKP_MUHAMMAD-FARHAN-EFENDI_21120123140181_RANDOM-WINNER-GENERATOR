@@ -6,20 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Random Winner Generator</title>
     <link rel="stylesheet" type="text/css" href="Main.css">
-    <script>
-        function validateInput(event) {
-            var inputType = document.querySelector('input[name="inputType"]:checked').value;
-            var key = event.keyCode || event.which;
-            var charStr = String.fromCharCode(key);
-            if (inputType === 'letters' && /\d/.test(charStr)) {
-                event.preventDefault();
-                alert("Please enter letters only!");
-            } else if (inputType === 'numbers' && /[a-zA-Z]/.test(charStr)) {
-                event.preventDefault();
-                alert("Please enter numbers only!");
-            }
-        }
-    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
 </head>
 
 <body>
@@ -27,7 +14,7 @@
         <strong>
             <h1>TUGAS AKHIR</h1>
         </strong>
-            <h2 class="namaSaya">MUHAMMAD FARHAN EFENDI / 21120123140181</h2>
+        <h2 class="namaSaya">MUHAMMAD FARHAN EFENDI / 21120123140181</h2>
         <div class="random-name">
             <nav>
                 <ul>
@@ -37,97 +24,132 @@
         </div>
     </header>
     <br><br>
+
     <div class="container">
         <h2>RANDOM WINNER GENERATOR</h2>
-        <form method="post" onsubmit="return validateForm()">
+        <?php
+        session_start();
+        class CandidateManager {
+            private $calon;
+            private $winners;
+        
+            public function __construct() {
+                if (!isset($_SESSION['calon'])) {
+                    $_SESSION['calon'] = [];
+                }
+                if (!isset($_SESSION['winners'])) {
+                    $_SESSION['winners'] = [];
+                }
+                $this->calon = &$_SESSION['calon'];
+                $this->winners = &$_SESSION['winners'];
+            }
+        
+            public function stackPush($input) {
+                if (!empty($input)) {
+                    $entries = array_filter(array_map('trim', explode("\n", $input)));
+                    foreach ($entries as $entry) {
+                        if (!in_array($entry, $this->calon)) {
+                            $this->calon[] = $entry;
+                        }
+                    }
+                }
+            }
+        
+            public function stackPop() {
+                array_pop($this->calon);
+                unset($_SESSION['winners']);
+            }
+        
+            public function clearAll() {
+                $this->calon = [];
+                unset($_SESSION['winners']);
+            }
+        
+            public function tampilData() {
+                $output = "<pre>Calon Pemenang :\n";
+                foreach ($this->calon as $calon) {
+                    $output .= ($calon) . "\n";
+                }
+                $output .= "</pre>";
+                return $output;
+            }
+        
+            public function tampilPemenang() {
+                $output = '';
+                if (!empty($this->winners)) {
+                    $output .= "<div id='winnerList'><pre>Daftar Pemenang :\n";
+                    foreach ($this->winners as $winner) {
+                        $output .= ($winner) . "\n";
+                    }
+                    $output .= "</pre></div>";
+                }
+                return $output;
+            }
+        
+            public function randomFunction() {
+                $output = '';
+                if (!empty($this->calon)) {
+                    shuffle($this->calon);
+                    $winner = array_pop($this->calon);
+                    $this->winners[] = $winner;
+                    $output .= "<pre>Selamat Kepada :\n<strong>" . ($winner) . "</strong></pre>";
+                } else {
+                    $output .= "<pre>Tidak ditemukan kandidat</pre>";
+                }
+                return $output;
+            }
+        }
+        
+        $inputType = isset($_POST['inputType']) ? $_POST['inputType'] : 'letters';
+        $pattern = $inputType == 'letters' ? '/^[a-zA-Z\s]+$/' : '/^[0-9\s]+$/';
+        $inputError = '';
+        $results = '';
+        
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $candidateManager = new CandidateManager();
+        
+            if (isset($_POST['submit'])) {
+                if (preg_match($pattern, $_POST['userInput'])) {
+                    $candidateManager->stackPush($_POST['userInput']);
+                    $results = $candidateManager->tampilData();
+                } else {
+                    $inputError = '<span style="color: red; font-weight: bold; display: block; text-align: center;">Input does not match the selected type</span>';
+
+                }
+            } elseif (isset($_POST['popData'])) {
+                $candidateManager->stackPop();
+                $results = $candidateManager->tampilData();
+            } elseif (isset($_POST['generateWinner'])) {
+                $results = $candidateManager->randomFunction();
+                $results .= $candidateManager->tampilPemenang();
+            } elseif (isset($_POST['clearAll'])) {
+                $candidateManager->clearAll();
+            }
+        }
+        ?>
+        
+                
+        <form method="post">
             <label for="inputType">Choose Input Type:</label><br><br>
-            <input type="radio" id="letters" name="inputType" value="letters">
+            <input type="radio" id="letters" name="inputType" value="letters" <?= $inputType == 'letters' ? 'checked' : '' ?>>
             <label for="letters">Letters</label>
-            <input type="radio" id="numbers" name="inputType" value="numbers">
+            <input type="radio" id="numbers" name="inputType" value="numbers" <?= $inputType == 'numbers' ? 'checked' : '' ?>>
             <label for="numbers">Numbers</label><br><br>
 
             <label for="userInput">Input Data</label><br><br>
-            <textarea name="userInput" spellcheck="false" rows="6" autocomplete="off" onkeypress="validateInput(event)"></textarea><br><br>
+            <textarea id="userInput" name="userInput" spellcheck="false" rows="6" autocomplete="off" pattern="<?= $pattern ?>"></textarea><br><br>
             <input type="submit" name="submit" value="Submit">
             <input type="submit" name="popData" value="Clear">
             <input type="submit" name="clearAll" value="Clear All"><br>
             <input type="submit" name="generateWinner" value="Generate Pemenang">
         </form>
-        
         <?php
-        session_start();
-
-        if (!isset($_SESSION['calon'])) {
-            $_SESSION['calon'] = [];
-        }
-        function stackPush() {
-            if (!empty($_POST['userInput'])) {
-                $entries = explode("\n", $_POST['userInput']);
-                foreach ($entries as $entry) {
-                    $entry = trim($entry);
-                    if (!empty($entry) && !in_array($entry, $_SESSION['calon'])) {
-                        array_push($_SESSION['calon'], $entry);
-                    }
-                }
-            }
-        }
-        function stackPop() {
-            array_pop($_SESSION['calon']);
-            unset($_SESSION['winners']);
+        if (!empty($inputError)) {
+            echo "<p style='color: red;'>$inputError</p>";
         }
 
-        function clearAll() {
-            $_SESSION['calon'] = [];
-            unset($_SESSION['winners']);
-        }
-
-        if (isset($_POST['clearAll'])) {
-            clearAll();
-        }
-
-        function tampilData() {
-            echo "<pre>Calon Pemenang :\n";
-            echo implode("\n", $_SESSION['calon']) . "</pre>";
-        }
-        function tampilPemenang() {
-            if (isset($_SESSION['winners'])) {
-                echo "<div id='winnerList'><pre>Daftar Pemenang :\n";
-                echo implode("\n", $_SESSION['winners']) . "</pre></div>";
-            }
-        }
-        function randomFunction() {
-            if (!empty($_SESSION['calon'])) {
-                echo "<script>showLoadingBar();</script>";
-
-                if (!isset($_SESSION['winners'])) {
-                    $_SESSION['winners'] = [];
-                }
-
-                shuffle($_SESSION['calon']);
-                $winner = array_pop($_SESSION['calon']);
-                $_SESSION['winners'][] = $winner;
-
-                echo "<pre>Selamat Kepada :\n<strong>$winner</strong></pre>";
-                echo "<script>hideLoadingBar();</script>";
-            } else {
-                echo "<pre>Tidak ditemukan kandidat</pre>";
-            }
-        }
-
-        if (isset($_POST['submit'])) {
-            stackPush();
-            tampilData();
-        }
-        if (isset($_POST['popData'])) {
-            stackPop();
-            tampilData();
-        }
-        if (isset($_POST['generateWinner'])) {
-            randomFunction();
-            tampilPemenang();
-        }
+        echo $results;
         ?>
     </div>
 </body>
-
 </html>
