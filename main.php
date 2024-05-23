@@ -32,7 +32,6 @@
             <nav>
                 <ul>
                     <li><a href="team.php">RANDOM TEAM GENERATOR</a></li>
-                    <li><a href="decision.php">DECISION MAKER</a></li>
                 </ul>
             </nav>
         </div>
@@ -54,21 +53,13 @@
             <input type="submit" name="clearAll" value="Clear All"><br>
             <input type="submit" name="generateWinner" value="Generate Pemenang">
         </form>
-    </div>
-</body>
-
-</html>
-
-
+        
         <?php
         session_start();
 
-        // Initialize data and GUI
         if (!isset($_SESSION['calon'])) {
             $_SESSION['calon'] = [];
         }
-
-        // Push data to stack
         function stackPush() {
             if (!empty($_POST['userInput'])) {
                 $entries = explode("\n", $_POST['userInput']);
@@ -80,14 +71,11 @@
                 }
             }
         }
-
-        // Pop data from stack
         function stackPop() {
             array_pop($_SESSION['calon']);
             unset($_SESSION['winners']);
         }
 
-        // Clear all data
         function clearAll() {
             $_SESSION['calon'] = [];
             unset($_SESSION['winners']);
@@ -97,21 +85,16 @@
             clearAll();
         }
 
-        // Display stack data
         function tampilData() {
             echo "<pre>Calon Pemenang :\n";
             echo implode("\n", $_SESSION['calon']) . "</pre>";
         }
-
-        // Display winners
         function tampilPemenang() {
             if (isset($_SESSION['winners'])) {
                 echo "<div id='winnerList'><pre>Daftar Pemenang :\n";
                 echo implode("\n", $_SESSION['winners']) . "</pre></div>";
             }
         }
-
-        // Random function with loading bar
         function randomFunction() {
             if (!empty($_SESSION['calon'])) {
                 echo "<script>showLoadingBar();</script>";

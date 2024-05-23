@@ -165,9 +165,9 @@ pre {
     font-size: 20px;
     color: #000000;
     text-align: center;
-    width: 50%;
-    margin-left: 366px;
-    margin-right: 366px;
+    width: 80%;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 @media (max-width: 600px) {
