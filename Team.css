@@ -158,9 +158,13 @@ pre {
     background-color: #f0efef;
     border-radius: 5px;
     margin-top: 10px;
-    font-size: 20px;
+    font-size: 15px;
     color: #000000;
     text-align: center;
+    margin-left: auto;
+    margin-right: auto;
+    width: 90%;
+    max-width: 600px;
 }
 
 @media (max-width: 800px) {
@@ -179,19 +183,23 @@ pre {
     background-color: #f0f0f0;
     border: 1px solid #ccc;
     border-radius: 5px;
-    font-size: 20px;
+    font-size: 15px;
     font-family: 'Courier New', Courier, monospace;
     color: #000000;
     text-align: center;
+    margin-left: 366px; 
+    margin-right: 366px;
 }
 
 #winnerList pre {
-    font-size: 20px; 
+    font-size: 15px; 
     color: #000000;
-    text-align: center;
+    text-align: justify;
+    margin-left: auto; 
+    margin-right: auto;
 }
 
-textarea {
+#userInput {
     font-family: Arial, sans-serif;
     font-size: 14px; 
     color: #333; 
@@ -205,9 +213,28 @@ textarea {
     height: 100px; 
 }
 
-textarea:hover,
-textarea:focus {
+#userInput:hover,
+#userInput:focus {
     border-color: #66afe9; 
     box-shadow: 0 0 5px rgba(102, 175, 233, 0.6); 
 }
 
+#teamNames {
+    font-family: Arial, sans-serif;
+    font-size: 14px; 
+    color: #333; 
+    padding: 10px; 
+    border: 1px solid #ccc; 
+    border-radius: 5px; 
+    background-color: #f9f9f9; 
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1); 
+    resize: none; 
+    width: 200px; 
+    height: 30px; 
+  }
+
+#teamNames:hover,
+#teamNames:focus {
+    border-color: #66afe9; 
+    box-shadow: 0 0 5px rgba(102, 175, 233, 0.6); 
+}
