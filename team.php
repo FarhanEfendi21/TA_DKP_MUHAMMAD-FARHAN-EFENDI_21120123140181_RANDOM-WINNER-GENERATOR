@@ -27,16 +27,21 @@
         <h2>RANDOM TEAM GENERATOR</h2>
         <form method="post">
             <label for="userInput">Input Data:</label><br><br>
-            <textarea name="userInput" spellcheck="false" rows="6" autocomplete="off"></textarea><br><br>
-            <label for="teamCount">Jumlah Tim:</label><br><br>
+            <textarea id="userInput" name="userInput"spellcheck="false" rows="6" autocomplete="off"></textarea><br><br>
+            <label for="teamCount">Jumlah Tim :</label><br><br>
             <input type="number" name="teamCount" min="1" value="1"><br><br>
+            <label for="teamNames">Nama Tim :</label><br><br>
+            <textarea id="teamNames" name="teamNames" spellcheck="false" rows="4" autocomplete="off"></textarea><br><br>
             <input type="submit" name="submit" value="Submit">
             <input type="submit" name="popData" value="Clear">
             <input type="submit" name="clearAll" value="Clear All"><br>
             <input type="submit" name="generateTeam" value="Generate Team">
         </form>
-    
-<?php
+    </div>
+</body>
+</html>
+
+<?php 
 session_start();
 
 class TeamManager {
@@ -82,16 +87,17 @@ class TeamManager {
     }
 
     public function tampilTim() {
-        if (!empty($this->teams)) {
-            echo "<div id='winnerList'><pre>Daftar Tim:\n";
-            foreach ($this->teams as $index => $team) {
-                echo "Tim " . ($index + 1) . " : " . implode(", ", $team) . "\n";
-            }
-            echo "</pre></div>";
+    if (!empty($this->teams)) {
+        echo "<div id='winnerList'><pre>Daftar Tim:\n";
+        foreach ($this->teams as $index => $team) {
+            $teamName = isset($_POST['teamNamesArray'][$index]) ? $_POST['teamNamesArray'][$index] : '';
+            echo "Tim " . ($index + 1) . " (" . $teamName . "): " . implode(", ", $team) . "\n";
         }
+        echo "</pre></div>";
     }
+}
 
-    public function randomFunction($teamCount) {
+    public function randomFunction($teamCount, $teamNames) {
         if (!empty($this->calon)) {
 
             if (empty($this->teams)) {
@@ -100,8 +106,10 @@ class TeamManager {
 
             $totalMembers = count($this->calon);
 
-            if ($totalMembers < $teamCount) {
-                echo "<script>alert('Jumlah kandidat tidak cukup untuk membuat $teamCount tim. Dibutuhkan minimal $teamCount kandidat.');</script>";
+            $minMembersRequired = $teamCount * 4;
+
+            if ($totalMembers < $minMembersRequired) {
+                echo "<script>alert('Jumlah kandidat tidak cukup untuk membuat $teamCount tim dengan minimal $minMembersRequired anggota per tim.');</script>";
                 return;
             }
 
@@ -114,7 +122,7 @@ class TeamManager {
 
             $this->teams = $teams;
             $this->calon = [];
-
+            
         } else {
             echo "<pre>Tidak ditemukan kandidat</pre>";
         }
@@ -134,7 +142,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     } elseif (isset($_POST['generateTeam'])) {
         $teamCount = isset($_POST['teamCount']) ? (int)$_POST['teamCount'] : 1;
-        $teamManager->randomFunction($teamCount);
+        $teamNames = isset($_POST['teamNames']) ? explode("\n", $_POST['teamNames']) : [];
+        $teamNames = array_map('trim', $teamNames); 
+        $teamManager->randomFunction($teamCount, $teamNames);
+        $_POST['teamNamesArray'] = $teamNames; 
         $teamManager->tampilTim();
 
     } elseif (isset($_POST['clearAll'])) {
