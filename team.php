@@ -16,7 +16,12 @@
         <div class="random-name">
             <nav>
                 <ul>
-                    <li><a href="main.php">RANDOM WINNER GENERATOR</a></li>
+                <li><a href="main.php">RANDOM WINNER GENERATOR</a></li>
+                    <li class="github-link">
+                        <a href="https://github.com/FarhanEfendi21/TA_DKP_MUHAMMAD-FARHAN-EFENDI_21120123140181_RANDOM-WINNER-GENERATOR/tree/main" target="_blank">
+                        <img src="img/githubLogo2.png" alt="GitHub Logo" style="width: 30px; height: 30px; vertical-align: middle; margin-right: auto;"> SOURCE CODE
+                        </a>
+                    </li>
                 </ul>
             </nav>
         </div>
