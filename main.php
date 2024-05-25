@@ -19,6 +19,11 @@
             <nav>
                 <ul>
                     <li><a href="team.php">RANDOM TEAM GENERATOR</a></li>
+                    <li class="github-link">
+                        <a href="https://github.com/FarhanEfendi21/TA_DKP_MUHAMMAD-FARHAN-EFENDI_21120123140181_RANDOM-WINNER-GENERATOR/tree/main" target="_blank">
+                        <img src="img/githubLogo2.png" alt="GitHub Logo" style="width: 30px; height: 30px; vertical-align: middle; margin-right: auto;"> SOURCE CODE
+                        </a>
+                    </li>
                 </ul>
             </nav>
         </div>
@@ -119,9 +124,11 @@
             } elseif (isset($_POST['popData'])) {
                 $candidateManager->stackPop();
                 $results = $candidateManager->tampilData();
+
             } elseif (isset($_POST['generateWinner'])) {
                 $results = $candidateManager->randomFunction();
                 $results .= $candidateManager->tampilPemenang();
+                
             } elseif (isset($_POST['clearAll'])) {
                 $candidateManager->clearAll();
             }
@@ -143,6 +150,7 @@
             <input type="submit" name="clearAll" value="Clear All"><br>
             <input type="submit" name="generateWinner" value="Generate Pemenang">
         </form>
+        
         <?php
         if (!empty($inputError)) {
             echo "<p style='color: red;'>$inputError</p>";
