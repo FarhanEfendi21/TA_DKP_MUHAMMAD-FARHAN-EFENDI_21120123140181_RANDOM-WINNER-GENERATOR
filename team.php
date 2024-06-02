@@ -102,61 +102,73 @@ class TeamManager {
     }
 }
 
-    public function randomFunction($teamCount, $teamNames) {
-        if (!empty($this->calon)) {
+public function randomFunction($teamCount, $teamNames) {
+    global $error_message; 
 
-            if (empty($this->teams)) {
-                $this->teams = [];
-            }
+    if (!empty($this->calon)) {
 
-            $totalMembers = count($this->calon);
-
-            $minMembersRequired = $teamCount * 4;
-
-            if ($totalMembers < $minMembersRequired) {
-                echo "<script>alert('Jumlah kandidat tidak cukup untuk membuat $teamCount tim dengan minimal $minMembersRequired anggota per tim.');</script>";
-                return;
-            }
-
-            shuffle($this->calon);
-
-            $teams = array_fill(0, $teamCount, []);
-            for ($i = 0; $i < $totalMembers; $i++) {
-                $teams[$i % $teamCount][] = $this->calon[$i];
-            }
-
-            $this->teams = $teams;
-            $this->calon = [];
-            
-        } else {
-            echo "<pre>Tidak ditemukan kandidat</pre>";
+        if (empty($this->teams)) {
+            $this->teams = [];
         }
+
+        $totalMembers = count($this->calon);
+
+        $minMembersRequired = $teamCount * 4;
+
+        if ($totalMembers < $minMembersRequired) {
+            $error_message = "Jumlah kandidat tidak cukup untuk membuat $teamCount tim dengan minimal $minMembersRequired anggota per tim.";
+            return;
+        }
+        
+        shuffle($this->calon);
+
+        $teams = array_fill(0, $teamCount, []);
+        for ($i = 0; $i < $totalMembers; $i++) {
+            $teams[$i % $teamCount][] = $this->calon[$i];
+        }
+
+        $this->teams = $teams;
+        $this->calon = [];
+        
+    } else {
+        $error_message = "Tidak ditemukan kandidat.";
     }
+}
 }
 
 $teamManager = new TeamManager();
+$error_message = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (isset($_POST['submit'])) {
-        $teamManager->stackPush($_POST['userInput']);
-        $teamManager->tampilData();
-
-    } elseif (isset($_POST['popData'])) {
-        $teamManager->stackPop();
-        $teamManager->tampilData();
-
-    } elseif (isset($_POST['generateTeam'])) {
-        $teamCount = isset($_POST['teamCount']) ? (int)$_POST['teamCount'] : 1;
-        $teamNames = isset($_POST['teamNames']) ? explode("\n", $_POST['teamNames']) : [];
-        $teamNames = array_map('trim', $teamNames); 
-        $teamManager->randomFunction($teamCount, $teamNames);
-        $_POST['teamNamesArray'] = $teamNames; 
-        $teamManager->tampilTim();
-
-    } elseif (isset($_POST['clearAll'])) {
-        $teamManager->clearAll();
-    }
+if (isset($_POST['submit'])) {
+    $teamManager->stackPush($_POST['userInput']);
+    $teamManager->tampilData();
 }
+
+if (isset($_POST['popData'])) {
+    $teamManager->stackPop();
+    $teamManager->tampilData();
+}
+
+if (isset($_POST['generateTeam'])) {
+    $teamCount = isset($_POST['teamCount']) ? (int)$_POST['teamCount'] : 1;
+    $teamNames = isset($_POST['teamNames']) ? explode("\n", $_POST['teamNames']) : [];
+    $teamNames = array_map('trim', $teamNames); 
+    $teamManager->randomFunction($teamCount, $teamNames);
+    $_POST['teamNamesArray'] = $teamNames; 
+    $teamManager->tampilTim();
+}
+
+if (isset($_POST['clearAll'])) {
+    $teamManager->clearAll();
+}
+}
+
+
+if (!empty($error_message)) {
+echo "<div style='color: red; font-weight: bold; text-align: center;'>$error_message</div>";
+}
+
 ?>
   
   </div>
