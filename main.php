@@ -105,11 +105,15 @@
             }
         }
         
+        
+
         $inputType = isset($_POST['inputType']) ? $_POST['inputType'] : 'letters';
         $pattern = $inputType == 'letters' ? '/^[a-zA-Z\s]+$/' : '/^[0-9\s]+$/';
         $inputError = '';
         $results = '';
         
+       
+
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $candidateManager = new CandidateManager();
         
@@ -119,23 +123,19 @@
                     $results = $candidateManager->tampilData();
                 } else {
                     $inputError = '<span style="color: red; font-weight: bold; display: block; text-align: center;">Input does not match the selected type</span>';
-
                 }
             } elseif (isset($_POST['popData'])) {
                 $candidateManager->stackPop();
                 $results = $candidateManager->tampilData();
-
             } elseif (isset($_POST['generateWinner'])) {
                 $results = $candidateManager->randomFunction();
                 $results .= $candidateManager->tampilPemenang();
-                
             } elseif (isset($_POST['clearAll'])) {
                 $candidateManager->clearAll();
             }
         }
         ?>
         
-                
         <form method="post">
             <label for="inputType">Choose Input Type:</label><br><br>
             <input type="radio" id="letters" name="inputType" value="letters" <?= $inputType == 'letters' ? 'checked' : '' ?>>
@@ -161,3 +161,4 @@
     </div>
 </body>
 </html>
+
