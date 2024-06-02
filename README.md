@@ -11,6 +11,6 @@ Membuat tim acak saat mengadakan rekreasi dan pertemuan sosial.
 2. Modul 2 : If - Else
 3. Modul 3 : Perulangan
 4. Modul 4 : Function
-5. Modul 5 : OOP (Class Constructor)
+5. Modul 5 : OOP I (Class Constructor)
 6. Modul 7 : Stack
 7. Modul 8 : GUI
