@@ -7,7 +7,7 @@ Untuk mengambil nomor pemenang untuk acara pengundian hadiah / doorprize.
 Memutuskan penyelenggara pesta, acara, dll.
 Membuat tim acak saat mengadakan rekreasi dan pertemuan sosial.
 
-1. Modul 1 : Variable
+1. Modul 1 : Variable dan Tipe Data
 2. Modul 2 : If - Else
 3. Modul 3 : Perulangan
 4. Modul 4 : Function
